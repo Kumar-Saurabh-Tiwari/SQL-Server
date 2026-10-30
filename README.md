@@ -6,6 +6,7 @@ The application:
 
 - Connects to MySQL using a connection pool.
 - Loads city records from the `city` table in the `world` database.
+- Provides parameterized CRUD endpoints for records in the `Users` table.
 - Serves a browser-based dashboard from the `view` folder.
 - Displays city name, country code, district, and population.
 - Shows total cities, countries, and population statistics.
@@ -113,6 +114,22 @@ If the database query fails, the endpoint returns HTTP `500` with:
 }
 ```
 
+### User CRUD endpoints
+
+The user endpoints use JSON request bodies with `name` and `email` fields:
+
+| Method | Route | Description |
+|---|---|---|
+| `POST` | `/api/users` | Insert a new user |
+| `PUT` | `/api/users/:id` | Update an existing user |
+| `PATCH` | `/api/users/:id` | Update an existing user |
+| `DELETE` | `/api/users/:id` | Delete a user |
+
+Successful insertion returns `201` and the created record. Updates return `200`,
+deletions return `204`, invalid input returns `400`, and updating or deleting a
+non-existent user returns `404`. Database failures are logged on the server and
+return `500` without exposing database details to clients.
+
 ## Dashboard features
 
 - **SQL database heading** clearly indicates that records are fetched from SQL.
@@ -134,6 +151,8 @@ SQL-Server/
 ├── .env                    # Local database credentials; do not commit
 ├── .env.example            # Environment variable template
 ├── .gitignore              # Ignored files and folders
+├── routes/
+│   └── users.js            # User insertion, update, and deletion endpoints
 ├── util/
 │   └── database.js         # MySQL connection pool
 └── view/
@@ -152,11 +171,14 @@ mysql.createPool({
   port: Number(process.env.DB_PORT || 3306),
   user: process.env.DB_USER,
   password: process.env.DB_PASSWORD,
-  database: process.env.DB_NAME
+  database: process.env.DB_NAME,
+  waitForConnections: true,
+  connectionLimit: Number(process.env.DB_CONNECTION_LIMIT || 10),
+  queueLimit: 0
 });
 ```
 
-Keeping these values in `.env` prevents credentials from being hardcoded in the source files. Use different credentials for development, staging, and production.
+Keeping these values in `.env` prevents credentials from being hardcoded in the source files. Use different credentials for development, staging, and production. The application reuses a bounded connection pool and closes it during graceful shutdown to avoid connection leaks.
 
 ## Troubleshooting
 

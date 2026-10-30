@@ -1,9 +1,11 @@
 const express = require('express');
 const path = require('path');
 const db = require('./util/database'); // Import your database connection
+const userRoutes = require('./routes/users');
 
 const app = express();
 
+app.use(express.json());
 app.use(express.static(path.join(__dirname, 'view')));
 
 app.get('/api/cities', async (req, res) => {
@@ -16,10 +18,39 @@ app.get('/api/cities', async (req, res) => {
     }
 });
 
+app.use('/api/users', userRoutes);
+
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'view', 'index.html'));
 });
 
-app.listen(3000, () => {
-    console.log('Server is running on port 3000');
+app.use((error, req, res, next) => {
+    if (error instanceof SyntaxError && error.status === 400 && error.type === 'entity.parse.failed') {
+        return res.status(400).json({ error: 'Request body must contain valid JSON.' });
+    }
+
+    return next(error);
 });
+
+if (require.main === module) {
+    const port = Number(process.env.PORT || 3000);
+    const server = app.listen(port, () => {
+        console.log(`Server is running on port ${port}`);
+    });
+
+    const shutdown = () => {
+        server.close(() => {
+            db.end()
+                .then(() => process.exit(0))
+                .catch((error) => {
+                    console.error('Failed to close the database pool:', error);
+                    process.exit(1);
+                });
+        });
+    };
+
+    process.once('SIGINT', shutdown);
+    process.once('SIGTERM', shutdown);
+}
+
+module.exports = app;
