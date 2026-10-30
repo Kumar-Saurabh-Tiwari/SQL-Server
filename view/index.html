@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cities from SQL Database</title>
+  <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+  <main class="shell">
+    <header class="hero">
+      <div>
+        <p class="eyebrow">SQL DATABASE</p>
+        <h1>Cities fetched from SQL database</h1>
+        <p class="subtitle">This list is loaded directly from the <strong>city</strong> table in MySQL.</p>
+      </div>
+      <div class="status"><span class="status-dot"></span><span id="statusText">Connecting...</span></div>
+    </header>
+
+    <section class="summary" aria-label="City statistics">
+      <article class="card"><span class="card-label">Total cities</span><strong id="cityCount">—</strong><span class="card-accent">records</span></article>
+      <article class="card"><span class="card-label">Countries</span><strong id="countryCount">—</strong><span class="card-accent">represented</span></article>
+      <article class="card"><span class="card-label">Total population</span><strong id="populationTotal">—</strong><span class="card-accent">people</span></article>
+    </section>
+
+    <section class="panel">
+      <div class="toolbar">
+        <div>
+          <h2>City directory</h2>
+          <p id="resultText">Loading city records...</p>
+        </div>
+        <label class="search">
+          <span aria-hidden="true">⌕</span>
+          <input id="searchInput" type="search" placeholder="Search cities or countries" aria-label="Search cities or countries">
+        </label>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th data-key="ID"># <button class="sort" aria-label="Sort by ID">↕</button></th>
+              <th data-key="Name">City <button class="sort" aria-label="Sort by city">↕</button></th>
+              <th data-key="CountryCode">Code <button class="sort" aria-label="Sort by country code">↕</button></th>
+              <th data-key="District">District <button class="sort" aria-label="Sort by district">↕</button></th>
+              <th class="population" data-key="Population">Population <button class="sort" aria-label="Sort by population">↕</button></th>
+            </tr>
+          </thead>
+          <tbody id="cityRows"></tbody>
+        </table>
+        <div id="emptyState" class="empty" hidden>No cities match your search.</div>
+        <div id="errorState" class="empty error" hidden>Could not connect to SQL database.</div>
+      </div>
+    </section>
+    <footer>Powered by your MySQL city database</footer>
+  </main>
+  <script src="/app.js"></script>
+</body>
+</html>
