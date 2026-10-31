@@ -7,6 +7,7 @@ The application:
 - Connects to MySQL using a connection pool.
 - Loads city records from the `city` table in the `world` database.
 - Provides parameterized CRUD endpoints for records in the `Users` table.
+- Provides endpoints for inserting buses and filtering them by available seats.
 - Serves a browser-based dashboard from the `view` folder.
 - Displays city name, country code, district, and population.
 - Shows total cities, countries, and population statistics.
@@ -130,6 +131,32 @@ deletions return `204`, invalid input returns `400`, and updating or deleting a
 non-existent user returns `404`. Database failures are logged on the server and
 return `500` without exposing database details to clients.
 
+### User and bus data endpoints
+
+The sample data in [`sample-data.sql`](./sample-data.sql) inserts users, buses,
+bookings, and payments, and includes the raw SQL queries for retrieving users
+and buses with more than 10 available seats.
+
+| Method | Route | Description |
+|---|---|---|
+| `POST` | `/api/users` | Insert a user with `name` and `email` |
+| `GET` | `/api/users` | Retrieve all users |
+| `POST` | `/api/buses` | Insert a bus with `busNumber`, `totalSeats`, and `availableSeats` |
+| `GET` | `/api/buses/available/:seats` | Retrieve buses with more than `:seats` available seats |
+
+Example bus request:
+
+```json
+{
+  "busNumber": "DL01AB1234",
+  "totalSeats": 40,
+  "availableSeats": 25
+}
+```
+
+For the required availability check, request
+`GET /api/buses/available/10`.
+
 ## Dashboard features
 
 - **SQL database heading** clearly indicates that records are fetched from SQL.
@@ -152,7 +179,9 @@ SQL-Server/
 ├── .env.example            # Environment variable template
 ├── .gitignore              # Ignored files and folders
 ├── routes/
-│   └── users.js            # User insertion, update, and deletion endpoints
+│   ├── users.js            # User insertion, retrieval, update, and deletion endpoints
+│   └── buses.js            # Bus insertion and seat-availability endpoints
+├── sample-data.sql         # Sample users, buses, bookings, payments, and queries
 ├── util/
 │   └── database.js         # MySQL connection pool
 └── view/

@@ -2,6 +2,7 @@ const express = require('express');
 const path = require('path');
 const db = require('./util/database'); // Import your database connection
 const userRoutes = require('./routes/users');
+const busRoutes = require('./routes/buses');
 
 const app = express();
 
@@ -19,6 +20,7 @@ app.get('/api/cities', async (req, res) => {
 });
 
 app.use('/api/users', userRoutes);
+app.use('/api/buses', busRoutes);
 
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'view', 'index.html'));

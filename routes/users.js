@@ -14,6 +14,32 @@ function parseUserId(value) {
     return Number.isSafeInteger(id) ? id : null;
 }
 
+router.get('/', async (req, res) => {
+    try {
+        const [rows] = await db.execute(`SELECT ${USER_FIELDS} FROM Users`);
+        return res.json(rows);
+    } catch (error) {
+        return sendDatabaseError(res, error, 'fetch');
+    }
+});
+
+router.get('/:id', async (req, res) => {
+    const id = parseUserId(req.params.id);
+    if (id === null) {
+        return res.status(400).json({ error: 'User id must be a positive integer.' });
+    }
+
+    try {
+        const [rows] = await db.execute(`SELECT ${USER_FIELDS} FROM Users WHERE id = ?`, [id]);
+        if (rows.length === 0) {
+            return res.status(404).json({ error: 'User not found.' });
+        }
+        return res.json(rows[0]);
+    } catch (error) {
+        return sendDatabaseError(res, error, 'fetch');
+    }
+});
+
 function validateUserInput(body) {
     const name = typeof body.name === 'string' ? body.name.trim() : '';
     const email = typeof body.email === 'string' ? body.email.trim() : '';
